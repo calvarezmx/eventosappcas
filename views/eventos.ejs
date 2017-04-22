@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html>
+    <head>
+
+		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"/>
+		<link rel="stylesheet" href="/font-awesome/css/font-awesome.min.css"/>
+		<link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+
+		<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+		<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+		<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+
+        <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.4/angular.min.js"></script>
+        <script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/angularjs/1.6.4/angular-animate.js"></script>
+        <script type="text/javascript" src="/javascripts/ui-bootstrap-tpls-2.5.0.min.js"></script>
+
+        <!--script type="text/javascript" src="/controller/eventosCtrl.js"></script-->
+        <!--script type="text/javascript" src="/controller/directivas.js"></script-->
+    </head>
+
+    <body ng-app="eventApp" ng-controller="eventCtrl as sc" id="eventCtrl">
+        <div class="container">
+            <div class="row">
+                <div class="col-sm-6">
+                    <h3>Eventos</h3>
+                </div>
+                <div class="col-sm-6 text-right">
+                    <a ng-click="sc.editEvent({}, 'edit')"  uib-tooltip="Agregar" class="btn btn-success animated jello">
+                        <span class="fa fa-plus" ></span>
+                        Agregar
+                    </a>
+                </div>
+            </div>
+            <div class="table-responsive">
+            	<table class="table table-striped">
+            		<thead>
+            			<tr>
+            				<th>Nombre</th>
+            				<th>Categoría</th>
+            				<th>Fecha de inicio</th>
+            				<th class="colActions">Acciones</th>
+            			</tr>
+            		</thead>
+            		<tbody>
+            			<tr ng-repeat="evt in sc.events | orderBy: 'date': true">
+            				<td ng-bind="evt.name"></td>
+            				<td ng-bind="evt.category"></td>
+            				<td ng-bind="evt.startdate | date : 'dd-MM-yyyy'"></td>
+            				<td>
+            					<a uib-tooltip="Ver detalle" class="btn btn-primary" ng-click="sc.editEvent(evt, 'detail')">
+            						<span class="fa fa-eye"></span>
+            					</a>
+
+            					<a uib-tooltip="Editar" class="btn btn-success" ng-click="sc.editEvent(evt, 'edit')">
+            						<span class="fa fa-edit"></span>
+            					</a>
+
+            					<a uib-tooltip="Eliminar" class="btn btn-danger" ng-click="sc.editEvent(evt, 'remove')">
+            						<span class="fa fa-trash"></span>
+            					</a>
+
+
+            				</td>
+            			</tr>
+            		</tbody>
+            	</table>
+            </div>
+        </div>
+
+        <script type="text/ng-template" id="editEvent.html">
+            <div class="modal-header" id="editEvent">
+                <button type="button" class="close" ng-click="sc.close()"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title" ng-bind="sc.action"></h4>
+            </div>
+            <form name="sc.formEdit" class="form-horizontal" ng-submit="sc.save(sc.event)" ng-init="sc.init()">
+	            <div class="modal-body">
+					<div class="form-group" ng-class="{'has-error': sc.formEdit.name.$invalid}">
+						<label class="control-label col-sm-4">Nombre * </label>
+						<div class="col-sm-8">
+							<input ng-required="true" type="text" class="form-control" name="name" ng-model="sc.event.name">
+						</div>
+					</div>
+
+					<div class="form-group" ng-class="{'has-error': sc.formEdit.category.$invalid}">
+						<label class="control-label col-sm-4">Categoría * </label>
+						<div class="col-sm-8">
+							<select ng-required="true" ng-model="sc.event.category" ng-options="cat for cat in sc.categorys" class="form-control" name="category">
+								<option value="" selected="selected">-- Selecciona una categoría --</option>
+							</select>
+						</div>
+					</div>
+
+					<div class="form-group" ng-class="{'has-error': sc.formEdit.place.$invalid}">
+						<label class="control-label col-sm-4">Lugar * </label>
+						<div class="col-sm-8">
+							<input ng-required="true" name="place" type="text" class="form-control" name="place" ng-model="sc.event.place">
+						</div>
+					</div>
+
+					<div class="form-group" ng-class="{'has-error': sc.formEdit.address.$invalid}">
+						<label class="control-label col-sm-4">Dirección * </label>
+						<div class="col-sm-8">
+							<input ng-required="true" type="text" class="form-control" name="address" ng-model="sc.event.address">
+						</div>
+					</div>
+
+					<div class="form-group" ng-class="{'has-error': sc.formEdit.startdate.$invalid}">
+						<label class="control-label col-sm-4">Fecha de inicio * </label>
+						<div class="col-sm-8">
+							<input ng-required="true" name="startdate" type="text" class="form-control" name="place" ng-model="sc.event.startdate" id="startdate">
+						</div>
+					</div>
+
+					<div class="form-group" ng-class="{'has-error': sc.formEdit.enddate.$invalid}">
+						<label class="control-label col-sm-4">Fecha fin * </label>
+						<div class="col-sm-8">
+							<input ng-required="true" name="enddate" type="text" class="form-control" name="place" ng-model="sc.event.enddate" id="enddate">
+						</div>
+					</div>
+
+					<div class="form-group" ng-class="{'has-error': sc.formEdit.event_type.$invalid}">
+						<label class="control-label col-sm-4">Tipo * </label>
+						<div class="col-sm-8">
+							<select ng-required="true" ng-model="sc.event.event_type" ng-options="typ for typ in sc.types" class="form-control" name="event_type">
+								<option value="" selected="selected">-- Selecciona tipo --</option>
+							</select>
+						</div>
+					</div>
+
+	        	</div>
+	        	<div class="modal-footer">
+	        		<div class="row">
+                        <div class="col-sm-6">
+                            <a class="btn btn-default" ng-click="sc.close()">
+                                <span class="fa fa-mail-reply fa-fw"></span>
+                                Cancelar
+                            </a>
+                        </div>
+                        <div class="col-sm-6">
+                            <button class="btn btn-success" type="submit" ng-disabled="sc.formEdit.$invalid || sc.saving">
+                                <span class="fa fa-save fa-fw"></span>
+                                Guardar
+                            </button>
+                        </div>
+                    </div>
+	        	</div>
+        	</form>
+        </script>
+
+        <script type="text/ng-template" id="removeEvent.html">
+            <div class="modal-header" id="editEvent">
+                <button type="button" class="close" ng-click="sc.close()"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title">Eliminar evento</h4>
+            </div>
+            <div class="modal-body">
+            	<h3 class="page-header">Eliminar evento: {{sc.event.name}}</h3>
+            </div>
+
+            <div class="modal-footer">
+	        		<div class="row">
+                        <div class="col-sm-6">
+                            <a class="btn btn-default" ng-click="sc.close()">
+                                <span class="fa fa-mail-reply fa-fw"></span>
+                                Cancelar
+                            </a>
+                        </div>
+                        <div class="col-sm-6">
+                            <button class="btn btn-danger" type="button" ng-click="sc.removeEvent(sc.event)">
+                                <span class="fa fa-save fa-fw"></span>
+                                Eliminar
+                            </button>
+                        </div>
+                    </div>
+	        	</div>
+        </script>
+
+        <script type="text/ng-template" id="detailEvent.html">
+            <div class="modal-header" id="detailEvent">
+                <button type="button" class="close" ng-click="sc.close()"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title">Detalle de evento</h4>
+            </div>
+	            <div class="modal-body form-horizontal">
+					<div class="form-group">
+						<label class="control-label col-sm-4">Nombre: </label>
+						<div class="col-sm-8">
+							<p class="form-control-static" ng-bind="sc.event.name"></p>
+						</div>
+					</div>
+
+					<div class="form-group">
+						<label class="control-label col-sm-4">Categoría: </label>
+						<div class="col-sm-8">
+							<p class="form-control-static" ng-bind="sc.event.category"></p>
+						</div>
+					</div>
+
+					<div class="form-group">
+						<label class="control-label col-sm-4">Lugar: </label>
+						<div class="col-sm-8">
+							<p class="form-control-static" ng-bind="sc.event.place"></p>
+						</div>
+					</div>
+
+					<div class="form-group">
+						<label class="control-label col-sm-4">Dirección: </label>
+						<div class="col-sm-8">
+							<p class="form-control-static" ng-bind="sc.event.address"></p>
+						</div>
+					</div>
+
+					<div class="form-group">
+						<label class="control-label col-sm-4">Fecha de inicio: </label>
+						<div class="col-sm-8">
+							<p class="form-control-static" ng-bind="sc.event.startdate"></p>
+						</div>
+					</div>
+
+					<div class="form-group">
+						<label class="control-label col-sm-4">Fecha fin: </label>
+						<div class="col-sm-8">
+							<p class="form-control-static" ng-bind="sc.event.enddate"></p>
+						</div>
+					</div>
+
+					<div class="form-group">
+						<label class="control-label col-sm-4">Tipo: </label>
+						<div class="col-sm-8">
+							<p class="form-control-static" ng-bind="sc.event.event_type"></p>
+						</div>
+					</div>
+
+	        	</div>
+	        	<div class="modal-footer">
+	        		<div class="row">
+                        <div class="col-sm-12">
+                            <a class="btn btn-default" ng-click="sc.close()">
+                                <span class="fa fa-mail-reply fa-fw"></span>
+                                Cerrar
+                            </a>
+                        </div>
+                    </div>
+	        	</div>
+        </script>
+
+        <script type="text/javascript">
+        	(function() {
+        		'use strict'
+        		angular.module('eventApp', ['ui.bootstrap', 'ngAnimate'])
+        		.controller('eventCtrl', EventCtrl)
+        		.controller('editEventCtrl', EditEventCtrl)
+        		.controller('removeEventCtrl', RemoveEventCtrl)
+        		.controller('detailEventCtrl', DetailEventCtrl)
+
+        		EventCtrl.$inject = ['$uibModal', '$filter']
+        		EditEventCtrl.$inject = ['$uibModalInstance', 'event', '$http']
+        		RemoveEventCtrl.$inject = ['$uibModalInstance', 'event', '$http']
+        		DetailEventCtrl.$inject = ['$uibModalInstance', 'event']
+
+        		function EventCtrl($uibModal, $filter) {
+        			var vm = this
+        			vm.events = JSON.parse('<%- JSON.stringify(events) %>')
+        			angular.forEach(vm.events, function(v, k) {
+        				v.startdate = $filter('date')(new Date(v.startdate).getTime(), 'dd/MM/yyyy', 'UTC')
+        				v.enddate = $filter('date')(new Date(v.enddate).getTime(), 'dd/MM/yyyy', 'UTC')
+        			})
+        			console.log('in eventCtrl: ', vm)
+        			vm.editEvent = function(event, action) {
+        				var instance = event ? angular.copy(event) : {}
+                        var modal = $uibModal.open({
+                            animation: true,
+                            keyboard: false,
+                            backdrop: 'static',
+                            templateUrl: action + 'Event.html',
+                            controller: action + 'EventCtrl',
+                            controllerAs: 'sc',
+                            size: 'md',
+                            resolve: {
+                                event: function () {
+                                    return instance
+                                }
+                            }
+                        })
+
+                        modal.result.then(function (instance) {
+
+                        }, function () {
+                            
+                        })
+        			}
+
+        			vm.detailEvent = function(event) {
+
+        			}
+        		}
+
+        		function EditEventCtrl($uibModalInstance, event, $http) {
+        			var vm = this
+        			vm.event = event || {}
+        			vm.action = event.id ? 'Editar evento' : 'Agregar evento'
+        			vm.categorys = ['Conferencia', 'Seminario', 'Congreso', 'Curso']
+        			vm.types = ['Presencial', 'Virtual']
+        			console.log('editCtrl: ', vm.event)
+
+        			vm.save = function(evt) {
+        				if(evt) {
+	        				var payload = {
+	        					name: evt.name,
+	        					category: evt.category,
+	        					place: evt.place,
+	        					address: evt.address,
+	        					startdate: evt.startdate,
+	        					enddate: evt.enddate,
+	        					event_type: evt.event_type
+	        				}
+	        				if(evt.hasOwnProperty('id')) {
+	        					payload.id = evt.id
+	        				}
+	        				$http({
+				                "method": "POST",
+				                "url": '/save',
+				                "data": payload,
+				                "config": {}
+				            })
+				            .then(function(res) {
+				                console.log('res success: ', res.data)
+				                window.location = window.location
+				            }, function(err) {
+				                console.log('res error: ', err.data)
+				            })
+				        }
+        			}
+
+        			vm.init = function() {
+        				jQuery("#startdate").datepicker({dateFormat: 'dd/mm/yy'})
+        				jQuery("#enddate").datepicker({dateFormat: 'dd/mm/yy'})
+        			}
+
+        			vm.close = function () {
+                        $uibModalInstance.dismiss('cancel')
+                    }
+        		}
+
+        		function RemoveEventCtrl($uibModalInstance, event, $http) {
+        			var vm = this
+        			vm.event = event || {}
+        			vm.removeEvent = function(evt) {
+        				$http({
+			                "method": "POST",
+			                "url": '/remove',
+			                "data": {id: evt.id},
+			                "config": {}
+			            })
+			            .then(function(res) {
+			                console.log('res success: ', res.data)
+			                window.location = window.location
+			            }, function(err) {
+			                console.log('res error: ', err.data)
+			            })
+        			}
+
+        			vm.close = function () {
+                        $uibModalInstance.dismiss('cancel')
+                    }
+        		}
+
+        		function DetailEventCtrl($uibModalInstance, event) {
+        			var vm = this
+        			vm.event = event || {}
+
+        			vm.close = function () {
+                        $uibModalInstance.dismiss('cancel')
+                    }
+        		}
+        	})()
+        </script>
+
+        <style type="text/css">
+        	.container {margin-top: 1em;}
+        	.colActions {width: 150px; max-width: 150px;}
+        </style>
+    </body>
